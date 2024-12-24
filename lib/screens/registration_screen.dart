@@ -4,6 +4,34 @@ import 'package:resep_mobile/screens/login_screen.dart';
 class RegistrationScreen extends StatelessWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
 
+  void _showSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, 
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Success',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text('Your account has been successfully created!'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); 
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,8 +43,8 @@ class RegistrationScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/images/Resepin Tjiandjoer.png', 
-                height: 200, 
+                'assets/images/Resepin Tjiandjoer.png',
+                height: 200,
               ),
               const SizedBox(height: 50),
 
@@ -90,12 +118,7 @@ class RegistrationScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoginScreen(), 
-                      ),
-                    );
+                    _showSuccessDialog(context);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -117,9 +140,7 @@ class RegistrationScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginScreen(), 
-                    ),
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
                   );
                 },
                 child: const Text(

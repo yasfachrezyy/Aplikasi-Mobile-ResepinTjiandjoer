@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:resep_mobile/model/resep_model.dart';
 import 'package:resep_mobile/screens/detail_screen.dart';
@@ -27,8 +28,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[
-          _selectedIndex], 
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: kBackgroundColor,
         unselectedItemColor: Colors.grey,
@@ -50,14 +50,78 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class HomePageContent extends StatelessWidget {
+class HomePageContent extends StatefulWidget {
   const HomePageContent({Key? key}) : super(key: key);
+
+  @override
+  _HomePageContentState createState() => _HomePageContentState();
+}
+
+class _HomePageContentState extends State<HomePageContent> {
+  final PageController _pageController = PageController();
+  late Timer _timer;
+  final TextEditingController _searchController = TextEditingController();
+  List<MenuMakanan> filteredMenuList = List.from(menuMakananList);
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+      if (_pageController.page == 4) {
+        _pageController.animateToPage(0,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut);
+      } else {
+        _pageController.nextPage(
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut);
+      }
+    });
+
+    _searchController.addListener(() {
+      setState(() {
+        String query = _searchController.text.toLowerCase();
+        filteredMenuList = menuMakananList.where((menu) {
+          return menu.namaMakanan.toLowerCase().contains(query);
+        }).toList();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _pageController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _showAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Notifikasi'),
+          content: const Text(
+              'Nasi Liwet Cianjur berhasil ditambahkan ke favorite'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false, 
+        automaticallyImplyLeading: false,
         backgroundColor: kBackgroundColor,
         elevation: 4.0,
         title: const Text(
@@ -71,7 +135,9 @@ class HomePageContent extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications, color: Colors.white),
-            onPressed: () {},
+            onPressed: () {
+              _showAlert(context);
+            },
           ),
         ],
       ),
@@ -82,6 +148,7 @@ class HomePageContent extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
+                controller: _searchController,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.green.shade50,
@@ -100,7 +167,8 @@ class HomePageContent extends StatelessWidget {
               child: SizedBox(
                 height: 200.0,
                 child: PageView.builder(
-                  itemCount: 5, 
+                  controller: _pageController,
+                  itemCount: 5,
                   itemBuilder: (context, index) {
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -126,23 +194,35 @@ class HomePageContent extends StatelessWidget {
             const SizedBox(height: 16.0),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ListResepPage(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Rekomendasi Hari Ini",
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
-                  );
-                },
-                child: const Text(
-                  "Lihat Semua",
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: kBackgroundColor,
                   ),
-                ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ListResepPage()),
+                      );
+                    },
+                    child: const Text(
+                      "Lihat Semua",
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.normal,
+                        color: kBackgroundColor,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16.0),
@@ -150,7 +230,7 @@ class HomePageContent extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: 4,
+              itemCount: filteredMenuList.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 16.0,
@@ -158,7 +238,7 @@ class HomePageContent extends StatelessWidget {
                 childAspectRatio: 1,
               ),
               itemBuilder: (context, index) {
-                final menu = menuMakananList[index];
+                final menu = filteredMenuList[index];
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(

@@ -42,7 +42,7 @@ List<MenuMakanan> menuMakananList = [
   ),
   MenuMakanan(
     id: 3,
-    namaMakanan: 'Geco (Toge Tauco) Cianjur',
+    namaMakanan: 'Geco Cianjur',
     image: ['assets/images/geco.png'],  
     lokasi: 'Geco Cap Meong',
     bahan: 'Tauge, tauco, mie kuning, tahu, bumbu kacang.',

@@ -2,9 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:resep_mobile/screens/editProfil_screen.dart';
 import 'package:resep_mobile/screens/settingProfil_screen.dart';
 import 'package:resep_mobile/screens/supportProfil_screen.dart';
+import 'package:resep_mobile/screens/login_screen.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, 
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Log Out',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text('Are you sure you want to log out?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); 
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (Route<dynamic> route) =>
+                      false, 
+                );
+              },
+              child: const Text(
+                'Log Out',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,19 +55,17 @@ class ProfilePage extends StatelessWidget {
         backgroundColor: Colors.orange,
         title: const Text(
           "Profile",
-          style: TextStyle(
-              color: Colors.white), 
+          style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.white, 
+            color: Colors.white,
           ),
           onPressed: () {
-            Navigator.pop(
-                context); 
+            Navigator.pop(context);
           },
         ),
         actions: [
@@ -34,8 +74,7 @@ class ProfilePage extends StatelessWidget {
               Icons.notifications,
               color: Colors.white,
             ),
-            onPressed: () {
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -47,7 +86,7 @@ class ProfilePage extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(80.0),
               child: Image.asset(
-                'assets/images/profile.png', 
+                'assets/images/profile.png',
                 width: 160,
                 height: 160,
                 fit: BoxFit.cover,
@@ -106,6 +145,7 @@ class ProfilePage extends StatelessWidget {
               title: 'Log Out',
               icon: Icons.logout,
               onTap: () {
+                _showLogoutDialog(context); 
               },
             ),
           ],
@@ -141,10 +181,6 @@ class ProfileMenuTile extends StatelessWidget {
           color: Colors.orange,
         ),
         title: Text(title),
-        trailing: const Icon(
-          Icons.arrow_forward,
-          color: Colors.white, 
-        ),
         onTap: onTap,
       ),
     );
